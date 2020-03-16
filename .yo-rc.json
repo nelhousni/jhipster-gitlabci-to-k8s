@@ -1,0 +1,38 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "dev.nortech.jhipster"
+    },
+    "jhipsterVersion": "6.8.0",
+    "applicationType": "monolith",
+    "baseName": "JHipster",
+    "packageName": "dev.nortech.jhipster",
+    "packageFolder": "dev/nortech/jhipster",
+    "serverPort": "8080",
+    "authenticationType": "jwt",
+    "cacheProvider": "no",
+    "enableHibernateCache": false,
+    "websocket": false,
+    "databaseType": "no",
+    "devDatabaseType": "no",
+    "prodDatabaseType": "no",
+    "searchEngine": false,
+    "messageBroker": false,
+    "serviceDiscoveryType": false,
+    "buildTool": "gradle",
+    "enableSwaggerCodegen": false,
+    "jwtSecretKey": "MWQxODA0NmM0ZWViMmZkMzdiZDA2MzVhZTZjYmY4YzAxYjkzNWI3NTdmYzRhNmE5MGU0YTNkNDAzMTI4Mjc4NWY3YmUyYjUwYTQwN2Q4NmE2NWI2ZTgzMGUzY2JiNzkxYmQ0NDk3MWQ2NmY3YzFiNjJlYTM3OTQ2ZGExN2JiMTA=",
+    "embeddableLaunchScript": false,
+    "useSass": true,
+    "clientPackageManager": "npm",
+    "skipClient": true,
+    "creationTimestamp": 1584353740031,
+    "testFrameworks": [],
+    "jhiPrefix": "jhi",
+    "entitySuffix": "",
+    "dtoSuffix": "DTO",
+    "otherModules": [],
+    "enableTranslation": false,
+    "blueprints": []
+  }
+}
