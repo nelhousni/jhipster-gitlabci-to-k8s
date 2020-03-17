@@ -33,8 +33,6 @@
     "dtoSuffix": "DTO",
     "otherModules": [],
     "enableTranslation": false,
-    "blueprints": [],
-    "herokuAppName": "nortech-jhipster",
-    "herokuDeployType": "jar"
+    "blueprints": []
   }
 }
