@@ -76,7 +76,7 @@ docker-push:
 deploy-to-production:
     stage: deploy
     script:
-        - ./helm-apply
+        - ./helm-upgrade
     environment:
         name: production
     when: manual
