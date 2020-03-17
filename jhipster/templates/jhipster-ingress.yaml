@@ -1,0 +1,14 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: jhipster
+  namespace: application
+spec:
+  rules:
+  - host: jhipster.application.35.197.200.155.nip.io
+    http:
+      paths:
+      - path: /*
+        backend:
+          serviceName: jhipster
+          servicePort: 8080

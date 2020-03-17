@@ -33,6 +33,16 @@
     "dtoSuffix": "DTO",
     "otherModules": [],
     "enableTranslation": false,
-    "blueprints": []
+    "blueprints": [],
+    "appsFolders": ["JHipster"],
+    "directoryPath": "../",
+    "dockerRepositoryName": "registry.gitlab.com/nelhousni",
+    "dockerPushCommand": "docker push",
+    "kubernetesNamespace": "application",
+    "kubernetesServiceType": "Ingress",
+    "ingressType": "gke",
+    "ingressDomain": "35.197.200.155.nip.io",
+    "monitoring": "prometheus",
+    "istio": false
   }
 }
