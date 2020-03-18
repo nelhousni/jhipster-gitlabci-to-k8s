@@ -1,14 +1,14 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: jhipster
-  namespace: production
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
 spec:
   rules:
-  - host: production.34.98.92.186.nip.io
+  - host: {{ .Release.Namespace }}.{{ .Values.domain_name }}
     http:
       paths:
       - path: /*
         backend:
-          serviceName: jhipster
+          serviceName: {{ .Release.Name }}
           servicePort: 80

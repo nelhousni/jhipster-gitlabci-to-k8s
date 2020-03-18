@@ -12,6 +12,16 @@ stages:
     - package
     - release
     - deploy
+
+variables:
+  CLUSTER_NAME: jhipster
+  ZONE: europe-west2-a
+  PROJECT: private-250107
+  DOMAIN_NAME: 34.98.92.186.nip.io
+  PROD_NAMESPACE: production
+  REGISTRY_URL: registry.gitlab.com
+  IMAGE_TAG: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
+
 before_script:
     - export GRADLE_USER_HOME=`pwd`/.gradle
 nohttp:
@@ -75,9 +85,17 @@ docker-push:
 
 deploy-to-production:
     stage: deploy
+    image: artemkin/helm-gke:1.0
+    before_script:
+      - echo ${SERVICE_ACCOUNT} | base64 -d > service-key.json
+      - gcloud auth activate-service-acount --key-file service-key.json
+      - gcloud container cluster get-credentials ${CLUSTER_NAME} --zone ${ZONE} --project ${PROJECT}
+      - helm init --client-only
     script:
-        - ./helm/helm-upgrade
+      - helm upgrade --install jhipster  ./helm/jhipster --namespace=${PROD_NAMESPACE} --set image_tag=${IMAGE_TAG} --set domain_name=${DOMAIN_NAME}
     environment:
-        name: production
-        url: http://jhipster.application.35.244.130.75.nip.io
+        name: ${PROD_NAMESPACE}
+        url: http://${PROD_NAMESPACE}.${DOMAIN_NAME}
     when: manual
+    only:
+      - master

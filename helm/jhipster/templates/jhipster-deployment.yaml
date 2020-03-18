@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: jhipster
-  namespace: production
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: jhipster
+      app: {{ .Release.Name }}
       version: "v1"
   template:
     metadata:
       labels:
-        app: jhipster
+        app: {{ .Release.Name }}
         version: "v1"
       annotations:
         prometheus.io/scrape: "true"
@@ -28,30 +28,14 @@ spec:
                     - key: app
                       operator: In
                       values:
-                        - jhipster
+                        - {{ .Release.Name }}
                 topologyKey: kubernetes.io/hostname
               weight: 100
-      initContainers:
-        - name: init-ds
-          image: busybox:latest
-          command:
-            - '/bin/sh'
-            - '-c'
-            - |
-                while true
-                do
-                  if [ $? -eq 0 ]; then
-                    echo "DB is UP"
-                    break
-                  fi
-                  echo "DB is not yet reachable;sleep for 10s before retry"
-                  sleep 10
-                done
       imagePullSecrets:
       - name: gitlab-auth
       containers:
       - name: jhipster-app
-        image: registry.gitlab.com/nelhousni/jhipster:latest
+        image: registry.gitlab.com/nelhousni/{{ .Release.Name }}:{{ .Values.image_tag }}
         env:
         - name: SPRING_PROFILES_ACTIVE
           value: prod
