@@ -14,6 +14,10 @@ spec:
       labels:
         app: jhipster
         version: "v1"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /management/prometheus
+        prometheus.io/port: "8080"
     spec:
       affinity:
         podAntiAffinity:

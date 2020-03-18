@@ -13,8 +13,11 @@ prometheus:
 grafana:
   ingress:
     enabled: true
+    path: /*
     hosts:
-    - jhipster-grafana.application.34.89.103.243.nip.io
+    - jhipster-grafana.application.34.98.92.186.nip.io
+  service:
+    type: NodePort
   datasources:
     datasources.yaml:
       apiVersion: 1
@@ -115,7 +118,7 @@ grafana:
                                 ],
                                 "datasource": "prometheus",
                                 "decimals": null,
-                                "description": "Service status",
+                                "description": "App status",
                                 "format": "none",
                                 "gauge": {
                                     "maxValue": 1,
@@ -163,17 +166,17 @@ grafana:
                                 "tableColumn": "Value",
                                 "targets": [
                                     {
-                                        "expr": "up{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "up{job=\"kubernetes-pods\", kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "format": "table",
                                         "intervalFactor": 2,
                                         "refId": "A",
                                         "step": 20,
                                         "metric": "up",
-                                        "legendFormat": "service"
+                                        "legendFormat": "app"
                                     }
                                 ],
                                 "thresholds": "0",
-                                "title": "Service Status Now",
+                                "title": "App Status Now",
                                 "type": "singlestat",
                                 "valueFontSize": "120%",
                                 "valueMaps": [
@@ -196,17 +199,16 @@ grafana:
                             },
                             {
                                 "id": 29,
-                                "title": "Service Uptime",
+                                "title": "Pods Uptime",
                                 "span": 8,
                                 "type": "graph",
                                 "targets": [
                                     {
                                         "refId": "A",
-                                        "expr": "up{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "count(up{job=\"kubernetes-pods\", kubernetes_namespace =\"$namespace\", app =\"$app\"})",
                                         "intervalFactor": 2,
                                         "format": "time_series",
-                                        "step": 2,
-                                        "legendFormat": "{{pod}}"
+                                        "step": 2
                                     }
                                 ],
                                 "datasource": "prometheus",
@@ -248,7 +250,7 @@ grafana:
                                 "stack": false,
                                 "percentage": false,
                                 "legend": {
-                                    "show": true,
+                                    "show": false,
                                     "values": false,
                                     "min": false,
                                     "max": false,
@@ -270,7 +272,7 @@ grafana:
                                 "seriesOverrides": [],
                                 "thresholds": [],
                                 "links": [],
-                                "description": "The uptime of the service"
+                                "description": "The uptime of the app"
                             }
                         ],
                         "repeat": null,
@@ -341,7 +343,7 @@ grafana:
                                 "tableColumn": "Value",
                                 "targets": [
                                     {
-                                        "expr": "com_codahale_metrics_servlet_InstrumentedFilter_requests_count{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "com_codahale_metrics_servlet_InstrumentedFilter_requests_count{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "format": "table",
                                         "intervalFactor": 2,
                                         "refId": "A",
@@ -420,7 +422,7 @@ grafana:
                                 "tableColumn": "Value",
                                 "targets": [
                                     {
-                                        "expr": "com_codahale_metrics_servlet_InstrumentedFilter_responseCodes_ok_total{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "com_codahale_metrics_servlet_InstrumentedFilter_responseCodes_ok_total{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "format": "table",
                                         "intervalFactor": 2,
                                         "legendFormat": "",
@@ -499,7 +501,7 @@ grafana:
                                 "tableColumn": "Value",
                                 "targets": [
                                     {
-                                        "expr": "com_codahale_metrics_servlet_InstrumentedFilter_responseCodes_serverError_total{namespace =\"$namespace\", service =\"$service_name\"} + com_codahale_metrics_servlet_InstrumentedFilter_responseCodes_badRequest_total{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "com_codahale_metrics_servlet_InstrumentedFilter_responseCodes_serverError_total{kubernetes_namespace =\"$namespace\", app =\"$app\"} + com_codahale_metrics_servlet_InstrumentedFilter_responseCodes_badRequest_total{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "format": "time_series",
                                         "intervalFactor": 2,
                                         "refId": "A",
@@ -577,7 +579,7 @@ grafana:
                                 "tableColumn": "",
                                 "targets": [
                                     {
-                                        "expr": "com_codahale_metrics_servlet_InstrumentedFilter_responseCodes_notFound_total{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "com_codahale_metrics_servlet_InstrumentedFilter_responseCodes_notFound_total{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "format": "time_series",
                                         "intervalFactor": 2,
                                         "refId": "A",
@@ -606,12 +608,12 @@ grafana:
                                 "targets": [
                                     {
                                         "refId": "A",
-                                        "expr": "com_codahale_metrics_servlet_InstrumentedFilter_activeRequests{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "com_codahale_metrics_servlet_InstrumentedFilter_activeRequests{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "intervalFactor": 2,
                                         "format": "time_series",
                                         "metric": "com_codahale_metrics_servlet_InstrumentedFilter_activeRequests",
                                         "step": 2,
-                                        "legendFormat": "{{service}}"
+                                        "legendFormat": "{{app}}"
                                     }
                                 ],
                                 "datasource": "prometheus",
@@ -726,31 +728,22 @@ grafana:
                                 "steppedLine": true,
                                 "targets": [
                                     {
-                                        "expr": "jvm_threads_count{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_threads_live_threads{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "format": "time_series",
                                         "intervalFactor": 2,
-                                        "legendFormat": "Total threads",
+                                        "legendFormat": "Live threads",
                                         "refId": "A",
                                         "step": 4,
-                                        "metric": "jvm_threads_count"
+                                        "metric": "jvm_threads_live_threads"
                                     },
                                     {
-                                        "expr": "jvm_threads_daemon_count{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_threads_daemon_threads{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "intervalFactor": 2,
                                         "format": "time_series",
                                         "refId": "B",
-                                        "metric": "jvm_threads_daemon_count",
+                                        "metric": "jvm_threads_daemon_threads",
                                         "step": 4,
                                         "legendFormat": "Daemon threads"
-                                    },
-                                    {
-                                        "expr": "jvm_threads_runnable_count{namespace =\"$namespace\", service =\"$service_name\"}",
-                                        "intervalFactor": 2,
-                                        "format": "time_series",
-                                        "refId": "C",
-                                        "metric": "jvm_threads_runnable_count",
-                                        "step": 4,
-                                        "legendFormat": "Runnable threads"
                                     }
                                 ],
                                 "thresholds": [],
@@ -826,7 +819,7 @@ grafana:
                                 "steppedLine": false,
                                 "targets": [
                                     {
-                                        "expr": "jvm_threads_blocked_count{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_threads_blocked_count{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "format": "time_series",
                                         "intervalFactor": 2,
                                         "legendFormat": "Blocked threads",
@@ -835,7 +828,7 @@ grafana:
                                         "metric": "jvm_threads_blocked_count"
                                     },
                                     {
-                                        "expr": "jvm_threads_deadlock_count{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_threads_deadlock_count{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "intervalFactor": 2,
                                         "format": "time_series",
                                         "refId": "B",
@@ -914,7 +907,7 @@ grafana:
                                 "steppedLine": false,
                                 "targets": [
                                     {
-                                        "expr": "jvm_threads_waiting_count{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_threads_waiting_count{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "format": "time_series",
                                         "intervalFactor": 2,
                                         "legendFormat": "Waiting threads",
@@ -1005,10 +998,10 @@ grafana:
                                 "steppedLine": false,
                                 "targets": [
                                     {
-                                        "expr": "jvm_buffers_direct_count{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_buffers_direct_count{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "format": "time_series",
                                         "intervalFactor": 2,
-                                        "legendFormat": "{{service}}",
+                                        "legendFormat": "{{app}}",
                                         "refId": "A",
                                         "step": 4,
                                         "metric": "jvm_buffers_direct_count"
@@ -1084,10 +1077,10 @@ grafana:
                                 "steppedLine": false,
                                 "targets": [
                                     {
-                                        "expr": "jvm_buffers_direct_used{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_buffers_direct_used{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "format": "time_series",
                                         "intervalFactor": 2,
-                                        "legendFormat": "{{service}}",
+                                        "legendFormat": "{{app}}",
                                         "refId": "A",
                                         "step": 4,
                                         "metric": "jvm_buffers_direct_used"
@@ -1163,10 +1156,10 @@ grafana:
                                 "steppedLine": false,
                                 "targets": [
                                     {
-                                        "expr": "jvm_buffers_direct_capacity{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_buffers_direct_capacity{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "format": "time_series",
                                         "intervalFactor": 2,
-                                        "legendFormat": "{{service}}",
+                                        "legendFormat": "{{app}}",
                                         "refId": "A",
                                         "step": 4,
                                         "metric": "jvm_buffers_direct_capacity"
@@ -1242,7 +1235,7 @@ grafana:
                                 "steppedLine": false,
                                 "targets": [
                                     {
-                                        "expr": "jvm_memory_heap_used{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_memory_heap_used{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "format": "time_series",
                                         "intervalFactor": 2,
                                         "legendFormat": "Used",
@@ -1251,7 +1244,7 @@ grafana:
                                         "metric": "jvm_memory_heap_used"
                                     },
                                     {
-                                        "expr": "jvm_memory_heap_max{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_memory_heap_max{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "intervalFactor": 2,
                                         "format": "time_series",
                                         "refId": "B",
@@ -1260,7 +1253,7 @@ grafana:
                                         "legendFormat": "Maximum"
                                     },
                                     {
-                                        "expr": "jvm_memory_heap_committed{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_memory_heap_committed{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "intervalFactor": 2,
                                         "format": "time_series",
                                         "refId": "C",
@@ -1339,7 +1332,7 @@ grafana:
                                 "steppedLine": false,
                                 "targets": [
                                     {
-                                        "expr": "jvm_memory_total_used{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_memory_total_used{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "format": "time_series",
                                         "intervalFactor": 2,
                                         "legendFormat": "Used",
@@ -1348,7 +1341,7 @@ grafana:
                                         "metric": "jvm_memory_total_used"
                                     },
                                     {
-                                        "expr": "jvm_memory_total_max{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_memory_total_max{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "intervalFactor": 2,
                                         "format": "time_series",
                                         "refId": "B",
@@ -1357,7 +1350,7 @@ grafana:
                                         "legendFormat": "Max"
                                     },
                                     {
-                                        "expr": "jvm_memory_total_committed{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_memory_total_committed{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "intervalFactor": 2,
                                         "format": "time_series",
                                         "refId": "C",
@@ -1438,7 +1431,7 @@ grafana:
                                 "steppedLine": false,
                                 "targets": [
                                     {
-                                        "expr": "jvm_memory_non_heap_used{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_memory_non_heap_used{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "format": "time_series",
                                         "intervalFactor": 2,
                                         "legendFormat": "Non Heap Used",
@@ -1447,7 +1440,7 @@ grafana:
                                         "metric": "jvm_memory_non_heap_used"
                                     },
                                     {
-                                        "expr": "jvm_memory_non_heap_committed{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_memory_non_heap_committed{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "intervalFactor": 2,
                                         "format": "time_series",
                                         "refId": "B",
@@ -1456,7 +1449,7 @@ grafana:
                                         "legendFormat": "Non Heap Committed"
                                     },
                                     {
-                                        "expr": "jvm_memory_pools_Metaspace_used{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_memory_pools_Metaspace_used{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "intervalFactor": 2,
                                         "format": "time_series",
                                         "refId": "C",
@@ -1465,7 +1458,7 @@ grafana:
                                         "legendFormat": "Metaspace Used"
                                     },
                                     {
-                                        "expr": "jvm_memory_pools_Code_Cache_used{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_memory_pools_Code_Cache_used{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "intervalFactor": 2,
                                         "format": "time_series",
                                         "refId": "D",
@@ -1556,7 +1549,7 @@ grafana:
                                 "steppedLine": false,
                                 "targets": [
                                     {
-                                        "expr": "jvm_memory_pools_PS_Eden_Space_used{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_memory_pools_PS_Eden_Space_used{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "format": "time_series",
                                         "intervalFactor": 2,
                                         "legendFormat": "Used",
@@ -1565,7 +1558,7 @@ grafana:
                                         "metric": "jvm_memory_pools_PS_Eden_Space_used"
                                     },
                                     {
-                                        "expr": "jvm_memory_pools_PS_Eden_Space_max{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_memory_pools_PS_Eden_Space_max{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "intervalFactor": 2,
                                         "format": "time_series",
                                         "refId": "B",
@@ -1644,7 +1637,7 @@ grafana:
                                 "steppedLine": false,
                                 "targets": [
                                     {
-                                        "expr": "jvm_memory_pools_PS_Survivor_Space_used{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_memory_pools_PS_Survivor_Space_used{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "format": "time_series",
                                         "intervalFactor": 2,
                                         "legendFormat": "Used",
@@ -1653,7 +1646,7 @@ grafana:
                                         "metric": "jvm_memory_pools_PS_Old_Gen_used"
                                     },
                                     {
-                                        "expr": "jvm_memory_pools_PS_Survivor_Space_max{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_memory_pools_PS_Survivor_Space_max{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "intervalFactor": 2,
                                         "format": "time_series",
                                         "refId": "B",
@@ -1732,7 +1725,7 @@ grafana:
                                 "steppedLine": false,
                                 "targets": [
                                     {
-                                        "expr": "jvm_memory_pools_PS_Old_Gen_used{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_memory_pools_PS_Old_Gen_used{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "format": "time_series",
                                         "intervalFactor": 2,
                                         "legendFormat": "Used",
@@ -1741,7 +1734,7 @@ grafana:
                                         "metric": "jvm_memory_pools_PS_Old_Gen_used"
                                     },
                                     {
-                                        "expr": "jvm_memory_pools_PS_Old_Gen_max{namespace =\"$namespace\", service =\"$service_name\"}",
+                                        "expr": "jvm_memory_pools_PS_Old_Gen_max{kubernetes_namespace =\"$namespace\", app =\"$app\"}",
                                         "intervalFactor": 2,
                                         "format": "time_series",
                                         "refId": "B",
@@ -1805,7 +1798,7 @@ grafana:
                                 "targets": [
                                     {
                                         "refId": "A",
-                                        "expr": "{__name__=~\"^jcache_statistics.*cache_hits\", namespace=\"$namespace\", service=\"$service_name\"}",
+                                        "expr": "{__name__=~\"^jcache_statistics.*cache_hits\", kubernetes_namespace=\"$namespace\", app=\"$app\"}",
                                         "intervalFactor": 2,
                                         "format": "time_series",
                                         "step": 2,
@@ -1885,7 +1878,7 @@ grafana:
                                 "targets": [
                                     {
                                         "refId": "A",
-                                        "expr": "{__name__=~\"^jcache_statistics.*cache_misses\", namespace=\"$namespace\", service=\"$service_name\"}",
+                                        "expr": "{__name__=~\"^jcache_statistics.*cache_misses\", kubernetes_namespace=\"$namespace\", app=\"$app\"}",
                                         "intervalFactor": 2,
                                         "format": "time_series",
                                         "step": 2,
@@ -1963,7 +1956,7 @@ grafana:
                                 "targets": [
                                     {
                                         "refId": "A",
-                                        "expr": "{__name__=~\"^jcache_statistics.*cache_gets\", namespace=\"$namespace\", service=\"$service_name\"}",
+                                        "expr": "{__name__=~\"^jcache_statistics.*cache_gets\", kubernetes_namespace=\"$namespace\", app=\"$app\"}",
                                         "intervalFactor": 2,
                                         "format": "time_series",
                                         "step": 2,
@@ -2041,7 +2034,7 @@ grafana:
                                 "targets": [
                                     {
                                         "refId": "A",
-                                        "expr": "{__name__=~\"^jcache_statistics.*cache_puts\", namespace=\"$namespace\", service=\"$service_name\"}",
+                                        "expr": "{__name__=~\"^jcache_statistics.*cache_puts\", kubernetes_namespace=\"$namespace\", app=\"$app\"}",
                                         "intervalFactor": 2,
                                         "format": "time_series",
                                         "step": 2,
@@ -2157,7 +2150,7 @@ grafana:
                                 "steppedLine": false,
                                 "targets": [
                                     {
-                                        "expr": "{__name__=~\".*rest.*_count\", namespace=\"$namespace\", service=\"$service_name\"} ",
+                                        "expr": "{__name__=~\".*rest.*_count\", kubernetes_namespace=\"$namespace\", app=\"$app\"} ",
                                         "format": "time_series",
                                         "intervalFactor": 2,
                                         "legendFormat": "{{__name__}}",
@@ -2232,7 +2225,7 @@ grafana:
                             "multi": false,
                             "name": "namespace",
                             "options": [],
-                            "query": "label_values(jvm_files, namespace)",
+                            "query": "label_values(process_uptime_seconds, kubernetes_namespace)",
                             "refresh": 2,
                             "regex": "",
                             "sort": 1,
@@ -2248,11 +2241,11 @@ grafana:
                             "datasource": "prometheus",
                             "hide": 0,
                             "includeAll": false,
-                            "label": "Service Name",
+                            "label": "App",
                             "multi": false,
-                            "name": "service_name",
+                            "name": "app",
                             "options": [],
-                            "query": "label_values(jvm_files, service)",
+                            "query": "label_values(process_uptime_seconds, app)",
                             "refresh": 2,
                             "regex": "",
                             "sort": 1,
