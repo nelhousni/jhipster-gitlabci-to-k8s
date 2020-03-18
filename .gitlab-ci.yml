@@ -76,7 +76,8 @@ docker-push:
 deploy-to-production:
     stage: deploy
     script:
-        - ./helm-upgrade
+        - ./helm/helm-upgrade
     environment:
         name: production
+        url: http://jhipster.application.35.244.130.75.nip.io
     when: manual

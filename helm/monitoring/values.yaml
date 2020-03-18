@@ -1,7 +1,7 @@
 prometheus:
   enabled: true
   server:
-    name: jhipster-prometheus
+    name: prometheus
     service:
       servicePort: 9090
   nodeExporter:
@@ -15,7 +15,7 @@ grafana:
     enabled: true
     path: /*
     hosts:
-    - jhipster-grafana.application.34.98.92.186.nip.io
+    - grafana.35.186.211.120.nip.io
   service:
     type: NodePort
   datasources:
@@ -24,7 +24,7 @@ grafana:
       datasources:
       - name: prometheus
         type: prometheus
-        url: http://jhipster-prometheus:9090
+        url: http://prometheus:9090
         access: proxy
         isDefault: true
         basicAuth: false
