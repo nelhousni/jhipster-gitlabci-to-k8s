@@ -43,9 +43,11 @@ spec:
                   echo "DB is not yet reachable;sleep for 10s before retry"
                   sleep 10
                 done
+      imagePullSecrets:
+      - name: gitlab-auth
       containers:
       - name: jhipster-app
-        image: registry.gitlab.com/nelhousni/jhipster
+        image: registry.gitlab.com/nelhousni/jhipster:latest
         env:
         - name: SPRING_PROFILES_ACTIVE
           value: prod
@@ -82,3 +84,4 @@ spec:
             path: /management/health
             port: http
           initialDelaySeconds: 120
+

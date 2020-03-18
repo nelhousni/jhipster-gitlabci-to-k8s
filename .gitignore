@@ -90,6 +90,12 @@ out/
 *.db
 
 ######################
+# Helm
+######################
+helm/*/charts/*.tgz
+helm/*/requirements.lock
+
+######################
 # Windows
 ######################
 # Windows image file caches

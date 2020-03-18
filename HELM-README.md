@@ -30,10 +30,10 @@ This repository in turn uses the `kubernetes` sub-generator for the microservice
 You can deploy all your applications by running the following bash command:
 
 ```
-bash helm-apply.sh (or) ./helm-apply.sh
+bash helm-install.sh (or) ./helm-install.sh
 ```
 
-`helm-apply.sh` will always do a clean install. Any of the existing charts with the same identity gets removed first and then it does a clean install.
+`helm-install.sh` will always do a clean install. Any of the existing charts with the same identity gets removed first and then it does a clean install.
 
 You can upgrade all your apps (if you have made any changes to the generated manifests) by running the following bash command:
 
