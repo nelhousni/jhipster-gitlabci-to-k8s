@@ -14,6 +14,7 @@ variables:
   GKE_ZONE: europe-west2-a
   GKE_PROJECT: private-250107
   DOMAIN_NAME: 35.244.130.75.nip.io
+  REVIEW_NAMESPACE: $CI_BUILD_REF_SLUG
   PROD_NAMESPACE: production
   DOCKER_IMAGE_TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
   DOCKER_IMAGE_FULL_NAME: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHA
@@ -47,12 +48,44 @@ docker-push:
     script:
         - ./gradlew jib -Pprod -Djib.to.image=$DOCKER_IMAGE_FULL_NAME -Djib.to.auth.username="gitlab-ci-token"  -Djib.to.auth.password=$CI_BUILD_TOKEN
 
+deploy-to-review-start:
+    stage: deploy
+    image: devth/helm:v3.1.1
+    script:
+      - init_gke
+      - kubectl create namespace $REVIEW_NAMESPACE
+      - kubectl create secret docker-registry gitlab-auth --docker-server=$CI_REGISTRY --docker-username=$CI_REGISTRY_USER --docker-password=$CI_REGISTRY_PASSWORD --namespace=$REVIEW_NAMESPACE
+      - helm upgrade --install jhipster ./helm/jhipster --namespace=$REVIEW_NAMESPACE --set image_tag=$DOCKER_IMAGE_TAG --set domain_name=$DOMAIN_NAME
+    environment:
+      name: $CI_BUILD_REF_SLUG
+      url: http://$CI_BUILD_REF_SLUG.$DOMAIN_NAME
+      on_stop: deploy-to-review-stop
+    only:
+      - branches
+    except:
+      - master
+
+deploy-to-review-stop:
+    stage: deploy
+    image: devth/helm:v3.1.1
+    script:
+      - init_gke
+      - helm uninstall jhipster --namespace=$REVIEW_NAMESPACE
+      - kubectl delete secret gitlab-auth --namespace=$REVIEW_NAMESPACE
+      - kubectl delete namespace $REVIEW_NAMESPACE
+    variables:
+      GIT_STRATEGY: none
+    when: manual
+    environment:
+      name: $CI_BUILD_REF_SLUG
+      action: stop
+
 deploy-to-production:
     stage: deploy
     image: devth/helm:v3.1.1
     script:
       - init_gke
-      - helm upgrade --install jhipster ./helm/jhipster --namespace=${PROD_NAMESPACE} --set image_tag=${DOCKER_IMAGE_TAG} --set domain_name=${DOMAIN_NAME}
+      - helm upgrade --install jhipster ./helm/jhipster --namespace=$PROD_NAMESPACE --set image_tag=$DOCKER_IMAGE_TAG --set domain_name=$DOMAIN_NAME
     environment:
         name: ${PROD_NAMESPACE}
         url: http://${PROD_NAMESPACE}.${DOMAIN_NAME}
